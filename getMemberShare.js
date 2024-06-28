@@ -3,7 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
 
-(async function memberShare() {
+(async function getMemberShare() {
     let options = new chrome.Options();
     options.addArguments('--headless');  // 使用無頭模式，可視情況刪除此行以顯示瀏覽器操作
     options.addArguments('--no-sandbox');
@@ -35,19 +35,19 @@ const path = require('path');
         await driver.wait(until.elementLocated(By.id('user_login')), 30000);
 
         // 填寫登入表單
-        const adminUsername = '04415@surfman.com';  // 替換為管理員用戶名
-        const adminPassword = '04415@surfman.com';  // 替換為管理員密碼
+        const adminUsername = '0346C@xx.com';  // 替換為管理員用戶名
+        const adminPassword = '0346C@xx.com';  // 替換為管理員密碼
         await driver.findElement(By.id('user_login')).sendKeys(adminUsername);
         await driver.findElement(By.id('user_pass')).sendKeys(adminPassword);
         await driver.findElement(By.id('wp-submit')).click();
         console.log('已提交登入表單');
         await takeScreenshot('2-已提交登入表單.png');
 
-        // 等待進入 WordPress Dashboard
-        console.log('已進入 WordPress Dashboard');
-        await takeScreenshot('3-已進入Dashboard.png');
+        // 等待直到元素可見並取得其值
+        let shareUrlInput = await driver.findElement(By.id('share_url'));
+        let shareUrlValue = await shareUrlInput.getAttribute('value');
 
-
+        console.log('分享連結的值:', shareUrlValue);
 
     } catch (error) {
         console.error('出現錯誤:', error);
