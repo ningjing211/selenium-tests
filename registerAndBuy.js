@@ -2,12 +2,21 @@ const { Builder, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
+
+// 設置 readline 接口
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 (async function registerAccount() {
     let options = new chrome.Options();
     options.addArguments('--headless');  // 設置無頭模式
     options.addArguments('--no-sandbox');
     options.addArguments('--disable-dev-shm-usage');
+    options.addArguments('--ignore-certificate-errors');  // 忽略 SSL 認證錯誤
+
     
     let driver = await new Builder()
         .forBrowser('chrome')
@@ -16,7 +25,7 @@ const path = require('path');
     
     async function takeScreenshot(filename) {
         // 確保 screenshots 文件夾存在
-        const screenshotsDir = path.join(__dirname, 'screenshots-forNewMember');
+        const screenshotsDir = path.join(__dirname, 'screenshots-registerAndBuy');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir);
         }
@@ -26,10 +35,35 @@ const path = require('path');
     }
     
     try {
-        // 打開 WordPress 註冊頁面
-        await driver.get('https://www.energyheart.com.tw/my-account/');
-        console.log('已打開註冊頁面');
-        await takeScreenshot('1-已打開註冊頁面.png');  // 截圖註冊頁面
+        
+        const ifStranger = await new Promise((resolve) => {
+            rl.question('請問您是陌生客戶嗎?:（1:是, 2:不是) ', resolve);
+        });
+
+        let linkFromUpper = '';
+
+        if (ifStranger.trim() !== '1') {
+            linkFromUpper = await new Promise((resolve) => {
+                rl.question('請輸入上家連結: ', resolve);
+            });
+            console.log(linkFromUpper, 'ㄔㄥ公');
+            await driver.get(linkFromUpper);
+            await driver.sleep(10000); // 假設等待 10 秒鐘
+            const theURL = await driver.getCurrentUrl();
+            console.log(theURL, '222');
+            await takeScreenshot('1-1-1已打開註冊頁面.png');
+            await driver.get('https://www.energyheart.com.tw/my-account/');
+            await takeScreenshot('1-1-2已打開註冊頁面.png');
+
+        } else {
+            // 打開 WordPress 註冊頁面
+            await driver.get('https://www.energyheart.com.tw/my-account/');
+            console.log('已打開註冊頁面');
+            await takeScreenshot('1-2-已打開註冊頁面.png');  // 截圖註冊頁面
+        }
+
+        rl.close();
+        
         
         // 等待註冊表單元素顯示，增加等待時間至 30 秒
         await driver.wait(until.elementLocated(By.id('reg_email')), 30000);
@@ -129,9 +163,13 @@ const path = require('path');
 
         await driver.findElement(By.name('woocommerce_checkout_place_order')).click();
         console.log('已結帳囉, 等待跳轉');
-        await driver.sleep(7000);
-        console.log('已結帳囉, 跳轉後');
+        await driver.sleep(15000);
+        console.log('跳轉成功 - 顯示訂單頁面');
         await takeScreenshot('94-完成結帳.png');
+        // 查找 <li> 标签中的 <strong> 子标签
+        const strongElement = await driver.findElement(By.css('.woocommerce-order-overview__order.order strong'));
+        const orderNumber = await strongElement.getText();
+        console.log('取得訂單編號-', orderNumber);
 
         // await driver.sleep(15000);
         // await takeScreenshot('83-selected_product.png');

@@ -2,6 +2,13 @@ const { Builder, By, Key, until } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
+
+// 設置 readline 接口
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 (async function reviewOrder() {
     let options = new chrome.Options();
@@ -13,6 +20,9 @@ const path = require('path');
         .forBrowser('chrome')
         .setChromeOptions(options)
         .build();
+
+    const orderIDs = [];  // 初始化订单号数组
+
 
     async function takeScreenshot(filename) {
         // 確保 screenshots 文件夾存在
@@ -26,6 +36,16 @@ const path = require('path');
     }
 
     try {
+
+        const getOrderID = await new Promise((resolve) => {
+            rl.question('請輸入訂單號碼: ', resolve);
+        });
+
+        // const orderIdsInput = await new Promise((resolve) => {
+        //     rl.question('請輸入訂單ID（用逗號分隔）: ', resolve);
+        // });
+        // const orderIds = orderIdsInput.split(',').map(id => id.trim());
+
         // 打開 WordPress 登入頁面
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
         console.log('已打開登入頁面');
@@ -64,11 +84,10 @@ const path = require('path');
 
         // 更改訂單狀態為處理中 ------------------------------------------------------------------------
 
-        // 訂單 ID 陣列
-        const orderIds = ['4983'];
+        orderIDs.push(getOrderID);
 
         // 遍歷每個訂單 ID
-        for (let orderId of orderIds) {
+        for (let orderId of orderIDs) {
             // 選擇特定訂單進行審核
             await driver.wait(until.elementLocated(By.xpath(`//input[@id='cb-select-${orderId}']`)), 30000);
             let checkbox = await driver.findElement(By.xpath(`//input[@id='cb-select-${orderId}']`));
@@ -92,7 +111,7 @@ const path = require('path');
          // 更改訂單狀態為完成 ------------------------------------------------------------------------
 
         // 遍歷每個訂單 ID
-        for (let orderId of orderIds) {
+        for (let orderId of orderIDs) {
             // 選擇特定訂單進行審核
             await driver.wait(until.elementLocated(By.xpath(`//input[@id='cb-select-${orderId}']`)), 30000);
             let checkbox = await driver.findElement(By.xpath(`//input[@id='cb-select-${orderId}']`));
