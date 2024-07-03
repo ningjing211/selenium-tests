@@ -3,6 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const xlsx = require('xlsx');
 
 // 設置 readline 接口
 const rl = readline.createInterface({
@@ -36,27 +37,31 @@ const rl = readline.createInterface({
     
     try {
         
+        let userLevel = '';
+
         const ifStranger = await new Promise((resolve) => {
-            rl.question('請問您是陌生客戶嗎?:（1:是, 2:不是) ', resolve);
+            rl.question('請問您是「沒有上家的陌生客戶」嗎?:（1:是, 2:不是) ', resolve);
         });
 
         let linkFromUpper = '';
 
         if (ifStranger.trim() !== '1') {
+            userLevel = 'Stranger';
             linkFromUpper = await new Promise((resolve) => {
                 rl.question('請輸入上家連結: ', resolve);
             });
-            console.log(linkFromUpper, 'ㄔㄥ公');
+            console.log('您輸入的連結為:', linkFromUpper);
             await driver.get(linkFromUpper);
             await driver.sleep(10000); // 假設等待 10 秒鐘
             const theURL = await driver.getCurrentUrl();
-            console.log(theURL, '222');
+            console.log('跳轉為連結:', theURL);
             await takeScreenshot('1-1-1已打開註冊頁面.png');
             await driver.get('https://www.energyheart.com.tw/my-account/');
             await takeScreenshot('1-1-2已打開註冊頁面.png');
 
         } else {
             // 打開 WordPress 註冊頁面
+            userLevel = 'Stranger';
             await driver.get('https://www.energyheart.com.tw/my-account/');
             console.log('已打開註冊頁面');
             await takeScreenshot('1-2-已打開註冊頁面.png');  // 截圖註冊頁面
@@ -90,7 +95,7 @@ const rl = readline.createInterface({
         // 點擊「接受」按鈕，如果有的話
         async function clickAcceptButton() {
             try {
-                await takeScreenshot('I-agree.png');
+                await takeScreenshot('點選I-agree後.png');
                 console.log('點選了我同意');
                 await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 60000); // 增加等待時間為 30 秒
                 let acceptButton = await driver.findElement(By.id('tpul-modal-btn-accept'));
@@ -129,6 +134,7 @@ const rl = readline.createInterface({
         await takeScreenshot('5-進入新航域合作專區.png');  // 截圖選擇專區
         
         // 選擇購買「豪華經典艙」
+        const comboName = '豪華經典艙';
         await driver.findElement(By.xpath('//h2[contains(text(), "豪華經典艙")]')).click();
         console.log('已選擇「豪華經典艙」');
         await takeScreenshot('6-選擇豪華經典艙.png');  // 截圖選擇產品
@@ -171,6 +177,17 @@ const rl = readline.createInterface({
         const orderNumber = await strongElement.getText();
         console.log('取得訂單編號-', orderNumber);
 
+
+        // 將結果保存到Excel
+        const workbook = xlsx.utils.book_new();
+        const worksheetData = [
+        ['User Email', 'User Level', 'Purchased combo', 'orderNumber'],
+        [testEmail, userLevel, comboName, orderNumber, /* more data here */]
+        ];
+        const worksheet = xlsx.utils.aoa_to_sheet(worksheetData);
+        xlsx.utils.book_append_sheet(workbook, worksheet, 'Test Results');
+        xlsx.writeFile(workbook, 'purchased_results.xlsx');
+        console.log('寫入Excel檔案並輸出:', 'purchased_results.xlsx');
         // await driver.sleep(15000);
         // await takeScreenshot('83-selected_product.png');
         // 2. 填寫配送地址等相關操作
