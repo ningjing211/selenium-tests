@@ -188,11 +188,6 @@ const rl = readline.createInterface({
         xlsx.utils.book_append_sheet(workbook, worksheet, 'Test Results');
         xlsx.writeFile(workbook, 'purchased_results.xlsx');
         console.log('寫入Excel檔案並輸出:', 'purchased_results.xlsx');
-        // await driver.sleep(15000);
-        // await takeScreenshot('83-selected_product.png');
-        // 2. 填寫配送地址等相關操作
-
-        // 假設還有其他結帳步驟，例如點擊確認按鈕等
 
         console.log('完成結帳流程');
 
