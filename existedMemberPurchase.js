@@ -85,13 +85,13 @@ const rl = readline.createInterface({
         const tdValue = await driver.findElement(By.xpath('//td[@class="role column-role" and @data-colname="使用者角色"]')).getText();
         console.log(`${user_account}的使用者角色為:`, tdValue);
 
-        // 打開 WordPress 登入頁面
+        // Second Login 使用者帳號輸入登入
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
         console.log('1-已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
 
         // 等待登入表單元素顯示
-        await driver.wait(until.elementLocated(By.id('user_login')), 10000);
+        await driver.wait(until.elementLocated(By.id('user_login')), 7000);
 
         // 填寫登入表單
         const userAccount = user_account;  // 替換為管理員用戶名
@@ -111,11 +111,38 @@ const rl = readline.createInterface({
         console.log('3-提交登入表單前(about to click)');
         await driver.findElement(By.id('wp-submit')).click();
         await takeScreenshot('ddd.png');
-        console.log('3-已提交登入表單(after click)');
-        await takeScreenshot('eee.png');
+        console.log('3-已提交登入表單(after clicked)');
+
+        // 點擊「接受」按鈕，如果有的話
+        console.log('準備點擊接受同意按鈕');
+        async function clickAcceptButton() {
+            try {
+                await takeScreenshot('點選I-agree後.png');
+                console.log('點選了我同意');
+                await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 15000); // 增加等待時間為 15 秒
+                let acceptButton = await driver.findElement(By.id('tpul-modal-btn-accept'));
+                console.log('元素可見確保前');
+                // 確保元素可見和可交互
+                await driver.wait(until.elementIsVisible(acceptButton), 8000);
+                await driver.wait(until.elementIsEnabled(acceptButton), 8000);
+                console.log('元素可見確保後+使用javascript點擊繞過交互性問題');
+                // 使用 JavaScript 點擊，有時候可以繞過某些交互性問題
+                await driver.executeScript("arguments[0].click();", acceptButton);
+                console.log('繞過問題了');
+                // 等待營運規章 loading 完成，可以根據具體網頁的 loading 時間調整等待時間
+                await driver.sleep(5000); // 假設等待 5 秒鐘
+                console.log('已點擊接受按鈕');
+                await takeScreenshot('4-點擊後-我的帳號頁面-您好.png');  // 截圖接受cookies
+            } catch (error) {
+                console.error('無法找到或點擊接受按鈕', error);
+                await takeScreenshot('8-accept_button_error.png');  // 截圖找不到接受按鈕或點擊錯誤
+            }
+        }
+
+        // 在進行結帳流程之前，先點擊接受按鈕
+        await clickAcceptButton();
 
         // 等待登入完成，檢查是否進入後台首頁
-        await driver.sleep(5000); // 假設等待 5 秒鐘
         console.log('4-登入後進到的地方(管理員會到後台/一般使用者到my-account');
         await takeScreenshot('4-登入後進到的地方.png');
 
@@ -123,6 +150,9 @@ const rl = readline.createInterface({
         // 進入購物頁面 https://www.energyheart.com.tw/products/
         await driver.get('https://www.energyheart.com.tw/products/');
         console.log('5-1已進入購物頁面');
+        await driver.sleep(5000); // 假設等待 5 秒鐘
+
+
 
         // 點擊「新航域合作專區」
         await driver.findElement(By.xpath('//div[contains(text(), "新航域合作專區")]')).click();
@@ -159,7 +189,7 @@ const rl = readline.createInterface({
         await takeScreenshot('8-1-進入購物車頁面.png');
 
         // 假設這裡需要進行結帳的相關操作，例如選擇配送方式、填寫地址等
-        await driver.sleep(7000);
+        await driver.sleep(9000);
         await takeScreenshot('8-2-讓購物車頁面跳轉後.png');
         console.log('8-2購物車頁面跳轉了');
 
