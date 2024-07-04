@@ -3,6 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const xlsx = require('xlsx');
 
 // 設置 readline 接口
 const rl = readline.createInterface({
@@ -35,7 +36,28 @@ const rl = readline.createInterface({
         fs.writeFileSync(path.join(screenshotsDir, filename), image, 'base64');
     }
 
+    function getOrderNumberFromExcel(filename) {
+        try {
+            const filePath = path.join(__dirname, filename);
+            const workbook = xlsx.readFile(filePath);
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+
+            // 假設訂單編號在第二行第四列（A1, B1, C1, D1）
+            const orderNumber = data[1][3]; // [1] 是第二行，[3] 是第四列
+            return orderNumber;
+        } catch (error) {
+            console.error('Error reading Excel file:', error);
+            return null;
+        }
+    }
+
     try {
+        console.log('準備讀取Excel裡面的購買訂單號碼...');
+        const filename = '18793@surfman.com_purchased_results.xlsx';
+        const orderNumber = getOrderNumberFromExcel(filename);
+        console.log('成功讀取到訂單號碼, Order Number:', orderNumber);
 
         const getOrderID = await new Promise((resolve) => {
             console.log('準備審核訂單...');

@@ -3,7 +3,7 @@ const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 const path = require('path');
 
-(async function getMemberShare() {
+(async function getMemberData() {
     let options = new chrome.Options();
     options.addArguments('--headless');  // 使用無頭模式，可視情況刪除此行以顯示瀏覽器操作
     options.addArguments('--no-sandbox');
@@ -16,7 +16,7 @@ const path = require('path');
 
     async function takeScreenshot(filename) {
         // 確保 screenshots 文件夾存在
-        const screenshotsDir = path.join(__dirname, 'screenshots-memberShare');
+        const screenshotsDir = path.join(__dirname, 'screenshots-getMemberData');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir);
         }
@@ -27,6 +27,7 @@ const path = require('path');
 
     try {
         // 打開 WordPress 登入頁面
+        console.log('準備登入MemberOrigin的帳號,分別存取儲值金, 分潤金, 分享連結的值');
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');

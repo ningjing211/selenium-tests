@@ -181,13 +181,13 @@ const rl = readline.createInterface({
         // 將結果保存到Excel
         const workbook = xlsx.utils.book_new();
         const worksheetData = [
-        ['User Email', 'User Level', 'Purchased combo', 'orderNumber'],
-        [testEmail, userLevel, comboName, orderNumber, /* more data here */]
+        ['user_email', 'user_Level', 'purchased_combo', 'orderNumber', 'credit', 'dividend', 'share_link'],
+        [testEmail, userLevel, comboName, orderNumber, 0, 0, '' /* more data here */]
         ];
         const worksheet = xlsx.utils.aoa_to_sheet(worksheetData);
         xlsx.utils.book_append_sheet(workbook, worksheet, 'Test Results');
-        xlsx.writeFile(workbook, 'purchased_results.xlsx');
-        console.log('寫入Excel檔案並輸出:', 'purchased_results.xlsx');
+        xlsx.writeFile(workbook, `${testEmail}_purchased_results.xlsx`);
+        console.log('寫入Excel檔案並輸出:', `${testEmail}_purchased_results.xlsx`);
 
         console.log('完成結帳流程');
 
