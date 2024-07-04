@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "registerAndBuy": "node registerAndBuy.js",
+    "admin": "node admin.js",
+    "changePassword": "node changePassword.js",
+    "energyHeart": "npm run registerAndBuy && npm run admin && npm run changePassword"
   },
   "keywords": [],
   "author": "",

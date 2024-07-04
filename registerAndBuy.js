@@ -13,7 +13,7 @@ const rl = readline.createInterface({
 
 (async function registerAccount() {
     let options = new chrome.Options();
-    options.addArguments('--headless');  // 設置無頭模式
+    // options.addArguments('--headless');  // 設置無頭模式
     options.addArguments('--no-sandbox');
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--ignore-certificate-errors');  // 忽略 SSL 認證錯誤
@@ -133,11 +133,11 @@ const rl = readline.createInterface({
         console.log('已點擊「新航域合作專區」');
         await takeScreenshot('5-進入新航域合作專區.png');  // 截圖選擇專區
         
-        // 選擇購買「豪華經典艙」
-        const comboName = '豪華經典艙';
-        await driver.findElement(By.xpath('//h2[contains(text(), "豪華經典艙")]')).click();
-        console.log('已選擇「豪華經典艙」');
-        await takeScreenshot('6-選擇豪華經典艙.png');  // 截圖選擇產品
+        // 選擇購買「尊貴頭等艙」
+        const comboName = '尊貴頭等艙';
+        await driver.findElement(By.xpath('//h2[contains(text(), "尊貴頭等艙")]')).click();
+        console.log('已選擇「尊貴頭等艙」');
+        await takeScreenshot('6-選擇尊貴頭等艙.png');  // 截圖選擇產品
         
        // 加入購物車
         let addToCartButton = await driver.findElement(By.css('.single_add_to_cart_button'));
@@ -176,7 +176,7 @@ const rl = readline.createInterface({
         const strongElement = await driver.findElement(By.css('.woocommerce-order-overview__order.order strong'));
         const orderNumber = await strongElement.getText();
         console.log('取得訂單編號-', orderNumber);
-
+        console.log('輸出這個新註冊的帳號:', testEmail);
 
         // 將結果保存到Excel
         const workbook = xlsx.utils.book_new();

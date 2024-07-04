@@ -38,6 +38,7 @@ const rl = readline.createInterface({
     try {
 
         const getOrderID = await new Promise((resolve) => {
+            console.log('準備審核訂單...');
             rl.question('請輸入訂單號碼: ', resolve);
         });
 
@@ -51,6 +52,7 @@ const rl = readline.createInterface({
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
 
+        rl.close();
         // 等待登入表單元素顯示
         await driver.wait(until.elementLocated(By.id('user_login')), 30000);
 
