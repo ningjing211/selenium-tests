@@ -131,7 +131,9 @@ async function admin(order_number) {
 
         // 更改訂單狀態為處理中 ------------------------------------------------------------------------
 
-        orderIDs.push(getOrderID);
+        // orderIDs.push(getOrderID);
+        orderIDs.push(order_number);
+
 
         // 遍歷每個訂單 ID
         for (let orderId of orderIDs) {
