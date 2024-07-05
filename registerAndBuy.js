@@ -67,6 +67,10 @@ const rl = readline.createInterface({
             await takeScreenshot('1-2-已打開註冊頁面.png');  // 截圖註冊頁面
         }
 
+        const comboBuying = await new Promise((resolve) => {
+            rl.question('您要買的套餐?(請輸入:豪華經典艙/能量商務艙/尊貴頭等艙):', resolve);
+        });
+
         rl.close();
         
         
@@ -134,10 +138,10 @@ const rl = readline.createInterface({
         await takeScreenshot('5-進入新航域合作專區.png');  // 截圖選擇專區
         
         // 選擇購買「尊貴頭等艙」
-        const comboName = '尊貴頭等艙';
-        await driver.findElement(By.xpath('//h2[contains(text(), "尊貴頭等艙")]')).click();
-        console.log('已選擇「尊貴頭等艙」');
-        await takeScreenshot('6-選擇尊貴頭等艙.png');  // 截圖選擇產品
+        const comboName = comboBuying;
+        await driver.findElement(By.xpath(`//h2[contains(text(), "${comboName}")]`)).click();
+        console.log(`已選擇${comboName}`);
+        await takeScreenshot(`6-選擇${comboName}.png`);  // 截圖選擇產品
         
        // 加入購物車
         let addToCartButton = await driver.findElement(By.css('.single_add_to_cart_button'));
@@ -190,6 +194,9 @@ const rl = readline.createInterface({
         console.log('寫入Excel檔案並輸出:', `${testEmail}_purchased_results.xlsx`);
 
         console.log('完成結帳流程');
+
+        const admin = require('./admin');
+        admin(orderNumber);
 
     } finally {
         // 關閉瀏覽器

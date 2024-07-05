@@ -11,7 +11,8 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-(async function reviewOrder() {
+async function admin(order_number) {
+    console.log('取得丟入的參數', order_number);
     let options = new chrome.Options();
     // options.addArguments('--headless');  // 設置無頭模式
     options.addArguments('--no-sandbox');
@@ -23,7 +24,7 @@ const rl = readline.createInterface({
         .build();
 
     const orderIDs = [];  // 初始化订单号数组
-
+    
 
     async function takeScreenshot(filename) {
         // 確保 screenshots 文件夾存在
@@ -72,11 +73,14 @@ const rl = readline.createInterface({
         const filename = '18793@surfman.com_purchased_results.xlsx';
         const result = getOrderNumberFromExcel(filename);
 
-        const orderNumber = result.orderNumber;
+        let orderNumber = result.orderNumber;
         const userEmail = result.user_email;
 
         console.log('成功讀取到此帳號Email, Email:', userEmail);
         console.log('成功讀取到訂單號碼, Order Number:', orderNumber);
+
+        orderNumber = order_number;
+        console.log('111', orderNumber);
 
         const getOrderID = await new Promise((resolve) => {
             console.log('準備審核訂單...');
@@ -229,4 +233,8 @@ const rl = readline.createInterface({
         // 關閉瀏覽器
         await driver.quit();
     }
-})();
+}
+
+// admin();
+
+module.exports = admin;

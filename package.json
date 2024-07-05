@@ -7,7 +7,8 @@
     "registerAndBuy": "node registerAndBuy.js",
     "admin": "node admin.js",
     "changePassword": "node changePassword.js",
-    "energyHeart": "npm run registerAndBuy && npm run admin && npm run changePassword"
+    "getMemberData": "node getMemberData.js",
+    "energyHeart": "npm run registerAndBuy && npm run admin && npm run changePassword && npm run getMemberData"
   },
   "keywords": [],
   "author": "",
