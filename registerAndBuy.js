@@ -133,7 +133,13 @@ const rl = readline.createInterface({
         console.log('已進入購物頁面');
 
         // 點擊「新航域合作專區」
-        await driver.findElement(By.xpath('//div[contains(text(), "新航域合作專區")]')).click();
+        await driver.sleep(5000); // 假設等待 5 秒鐘
+        const productLink = "新航域合作專區";
+        // Wait until the element is located and visible
+        const element = await driver.wait(until.elementLocated(By.xpath(`//a[contains(@class, 'elementor-button') and .//span[contains(text(), "${productLink}")]]`)), 10000);
+        await driver.wait(until.elementIsVisible(element), 5000);
+        await element.click();
+
         console.log('已點擊「新航域合作專區」');
         await takeScreenshot('5-進入新航域合作專區.png');  // 截圖選擇專區
         
@@ -196,7 +202,7 @@ const rl = readline.createInterface({
         console.log('完成結帳流程');
 
         const admin = require('./admin');
-        admin(orderNumber);
+        admin(orderNumber, testEmail);
 
     } finally {
         // 關閉瀏覽器

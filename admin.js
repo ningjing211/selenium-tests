@@ -11,8 +11,9 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-async function admin(order_number) {
-    console.log('取得丟入的參數', order_number);
+async function admin(order_number, test_email) {
+    console.log('admin登入審核中...將剛購買的訂單從保留改為處理改為完成');
+    console.log('取得丟入的參數, 訂單號碼:', order_number, 'email:', test_email);
     let options = new chrome.Options();
     // options.addArguments('--headless');  // 設置無頭模式
     options.addArguments('--no-sandbox');
@@ -69,24 +70,39 @@ async function admin(order_number) {
     }
 
     try {
-        console.log('準備讀取Excel裡面的購買訂單號碼...');
-        const filename = '18793@surfman.com_purchased_results.xlsx';
+
+        // //讀取檔案的功能
+        // console.log('準備讀取Excel裡面的購買訂單號碼...');
+        // const filename = '18793@surfman.com_purchased_results.xlsx';
+        // const result = getOrderNumberFromExcel(filename);
+
+        // let orderNumber = result.orderNumber;
+        // const userEmail = result.user_email;
+
+        // console.log('成功讀取到此帳號Email, Email:', userEmail);
+        // console.log('成功讀取到訂單號碼, Order Number:', orderNumber);
+
+        const filename = `${test_email}_purchased_results.xlsx`;
+        console.log('要開啟的檔案名稱', filename);
         const result = getOrderNumberFromExcel(filename);
-
-        let orderNumber = result.orderNumber;
         const userEmail = result.user_email;
+        
 
-        console.log('成功讀取到此帳號Email, Email:', userEmail);
-        console.log('成功讀取到訂單號碼, Order Number:', orderNumber);
 
-        orderNumber = order_number;
-        console.log('111', orderNumber);
+        let orderNumber = order_number;
+        console.log('印出', orderNumber);
 
-        const getOrderID = await new Promise((resolve) => {
-            console.log('準備審核訂單...');
-            rl.question('請輸入訂單號碼: ', resolve);
+        const ifInput = await new Promise((resolve) => {
+            rl.question('您要更改為手動輸入訂單嗎?(yes/no):', resolve);
         });
 
+        if (ifInput.trim() == 'yes' ) {
+            const getOrderID = await new Promise((resolve) => {
+                console.log('準備審核訂單...');
+                rl.question('請輸入訂單號碼: ', resolve);
+            });
+        }
+        console.log('好的, 自動擷取訂單號碼為:', orderNumber);
         // const orderIdsInput = await new Promise((resolve) => {
         //     rl.question('請輸入訂單ID（用逗號分隔）: ', resolve);
         // });
@@ -191,7 +207,7 @@ async function admin(order_number) {
         const element = await driver.findElement(By.xpath("//tbody[@id='order_line_items']//a[@class='wc-order-item-name']"));
         let boughtComboPaid = await element.getText();
 
-        console.log(boughtComboPaid);
+        console.log('已成功購買的combo經銷商等級:', boughtComboPaid);
         console.log('11-1-已進入使用者管理頁面');
         await takeScreenshot('11-1-已進入使用者管理頁面.png');
 
@@ -228,7 +244,7 @@ async function admin(order_number) {
         // 將更新後的 Excel 檔案寫入到磁碟
         xlsx.writeFile(workbook, filePath);
 
-        console.log('已將 user_email 更新到原始的 Excel 檔案中:', filePath);
+        console.log('已將 user_level 更新到原始的 Excel 檔案中:', filePath);
 
 
     } finally {
