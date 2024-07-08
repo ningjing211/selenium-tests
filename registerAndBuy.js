@@ -4,15 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const xlsx = require('xlsx');
-const login = require('./login');
+
 
 // 設置 readline 接口
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-
-
 
 (async function registerAccount() {
     let options = new chrome.Options();
@@ -38,31 +36,6 @@ const rl = readline.createInterface({
         fs.writeFileSync(path.join(screenshotsDir, filename), image, 'base64');
     }
     
-    // 點擊「接受」按鈕，如果有的話
-    async function clickAcceptButton() {
-        try {
-            await takeScreenshot('點選I-agree後.png');
-            console.log('點選了我同意');
-            await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 60000); // 增加等待時間為 30 秒
-            let acceptButton = await driver.findElement(By.id('tpul-modal-btn-accept'));
-            console.log('元素可見確保前');
-            // 確保元素可見和可交互
-            await driver.wait(until.elementIsVisible(acceptButton), 10000);
-            await driver.wait(until.elementIsEnabled(acceptButton), 10000);
-            console.log('元素可見確保後+使用javascript點擊繞過交互性問題');
-            // 使用 JavaScript 點擊，有時候可以繞過某些交互性問題
-            await driver.executeScript("arguments[0].click();", acceptButton);
-            console.log('繞過問題了');
-            // 等待營運規章 loading 完成，可以根據具體網頁的 loading 時間調整等待時間
-            await driver.sleep(5000); // 假設等待 5 秒鐘
-            console.log('已點擊接受按鈕');
-            await takeScreenshot('4-點擊後-我的帳號頁面-您好.png');  // 截圖接受cookies
-        } catch (error) {
-            console.error('無法找到或點擊接受按鈕', error);
-            await takeScreenshot('8-accept_button_error.png');  // 截圖找不到接受按鈕或點擊錯誤
-        }
-    }
-
     try {
         
         let userLevel = '';
@@ -73,52 +46,20 @@ const rl = readline.createInterface({
         
 
         let linkFromUpper = '';
-        let alreadyMemberAccount = '';
 
         if (ifStranger.trim() !== '1') {
             userLevel = 'Stranger';
             linkFromUpper = await new Promise((resolve) => {
-                rl.question('請輸入上家連結(若已是C級以上經銷商, 請輸入3): ', resolve);
+                rl.question('請輸入上家連結: ', resolve);
             });
-            if(linkFromUpper !== '3') {
-                console.log('您輸入的連結為:', linkFromUpper);
-                await driver.get(linkFromUpper);
-                await driver.sleep(10000); // 假設等待 10 秒鐘
-                const theURL = await driver.getCurrentUrl();
-                console.log('跳轉為連結:', theURL);
-                await takeScreenshot('1-1-1已打開註冊頁面.png');
-                await driver.get('https://www.energyheart.com.tw/my-account/');
-                await takeScreenshot('1-1-2已打開註冊頁面.png');
-            } else {
-                // 直接輸入您的帳號並進行購買流程
-                alreadyMemberAccount = await new Promise((resolve) => {
-                    rl.question('請輸入C級以上經銷商Email: ', resolve);
-                });
-                 // 打開 WordPress 登入頁面
-                await driver.get('https://www.energyheart.com.tw/wp-login.php');
-                console.log('已打開登入頁面');
-                await takeScreenshot(`1-已打開登入頁面_${alreadyMemberAccount}.png`);
-                // 更改訂單狀態
-                await driver.sleep(4200); // 添加延遲以確保上一步操作完成
-                // 等待登入表單元素顯示
-                await driver.wait(until.elementLocated(By.id('user_login')), 1000);
-
-                // 填寫登入表單
-                const adminUsername = alreadyMemberAccount;  // 替換為管理員用戶名
-                const adminPassword = alreadyMemberAccount;  // 替換為管理員密碼
-                await driver.findElement(By.id('user_login')).sendKeys(adminUsername);
-                await driver.findElement(By.id('user_pass')).sendKeys(adminPassword);
-                await takeScreenshot(`2-已填寫登入表單_${alreadyMemberAccount}.png`);
-
-                // 提交登入表單
-                await driver.findElement(By.id('wp-submit')).click();
-                console.log('已提交登入表單');
-
-                // 等待登入完成，檢查是否進入後台首頁
-                await driver.wait(until.urlContains('wp-admin'), 5000);
-                await takeScreenshot(`3-登入成功進入後台_${alreadyMemberAccount}.png`);
-                
-            }
+            console.log('您輸入的連結為:', linkFromUpper);
+            await driver.get(linkFromUpper);
+            await driver.sleep(10000); // 假設等待 10 秒鐘
+            const theURL = await driver.getCurrentUrl();
+            console.log('跳轉為連結:', theURL);
+            await takeScreenshot('1-1-1已打開註冊頁面.png');
+            await driver.get('https://www.energyheart.com.tw/my-account/');
+            await takeScreenshot('1-1-2已打開註冊頁面.png');
 
         } else {
             // 打開 WordPress 註冊頁面
@@ -155,6 +96,32 @@ const rl = readline.createInterface({
         await driver.wait(until.urlContains('my-account'), 30000);
         await takeScreenshot('3-註冊完成進入同意頁面.png');  // 截圖註冊後頁面
         
+
+
+        // 點擊「接受」按鈕，如果有的話
+        async function clickAcceptButton() {
+            try {
+                await takeScreenshot('點選I-agree後.png');
+                console.log('點選了我同意');
+                await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 60000); // 增加等待時間為 30 秒
+                let acceptButton = await driver.findElement(By.id('tpul-modal-btn-accept'));
+                console.log('元素可見確保前');
+                // 確保元素可見和可交互
+                await driver.wait(until.elementIsVisible(acceptButton), 10000);
+                await driver.wait(until.elementIsEnabled(acceptButton), 10000);
+                console.log('元素可見確保後+使用javascript點擊繞過交互性問題');
+                // 使用 JavaScript 點擊，有時候可以繞過某些交互性問題
+                await driver.executeScript("arguments[0].click();", acceptButton);
+                console.log('繞過問題了');
+                // 等待營運規章 loading 完成，可以根據具體網頁的 loading 時間調整等待時間
+                await driver.sleep(5000); // 假設等待 5 秒鐘
+                console.log('已點擊接受按鈕');
+                await takeScreenshot('4-點擊後-我的帳號頁面-您好.png');  // 截圖接受cookies
+            } catch (error) {
+                console.error('無法找到或點擊接受按鈕', error);
+                await takeScreenshot('8-accept_button_error.png');  // 截圖找不到接受按鈕或點擊錯誤
+            }
+        }
 
         // 在進行結帳流程之前，先點擊接受按鈕
         await clickAcceptButton();
