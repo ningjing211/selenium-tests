@@ -110,6 +110,7 @@ async function admin(order_number, test_email) {
 
         // 打開 WordPress 登入頁面
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
+        await driver.sleep(4200); // 添加延遲以確保上一步操作完成
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
 
@@ -253,6 +254,6 @@ async function admin(order_number, test_email) {
     }
 }
 
-// admin('5171', '39399@surfman.com');
+//await admin('5171', '39399@surfman.com');
 
 module.exports = admin;

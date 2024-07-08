@@ -39,9 +39,10 @@ async function changePassword(user_account) {
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
-
+        await driver.sleep(4200); // 添加延遲以確保上一步操作完成
         // 等待登入表單元素顯示
-        await driver.wait(until.elementLocated(By.id('user_login')), 30000);
+        
+        await driver.wait(until.elementLocated(By.id('user_login')), 1000);
 
         // 填寫登入表單
         const adminUsername = 'flowasitgoes@gmail.com';  // 替換為管理員用戶名
