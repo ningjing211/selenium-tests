@@ -6,12 +6,12 @@ const readline = require('readline');
 const xlsx = require('xlsx');
 
 // 設置 readline 接口
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+// const rl = readline.createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// });
 
-(async function getMemberData() {
+async function getMemberData(file_name) {
     let options = new chrome.Options();
     // options.addArguments('--headless');  // 使用無頭模式，可視情況刪除此行以顯示瀏覽器操作
     options.addArguments('--no-sandbox');
@@ -65,7 +65,7 @@ const rl = readline.createInterface({
         await driver.wait(until.elementLocated(By.id('user_login')), 30000);
 
         // 填寫登入表單
-        const filename = '18793@surfman.com_purchased_results.xlsx';
+        const filename = file_name;
         const filePath = path.join(__dirname, filename);
         const workbook = xlsx.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
@@ -149,4 +149,6 @@ const rl = readline.createInterface({
         // 關閉瀏覽器
         await driver.quit();
     }
-})();
+};
+
+module.exports = getMemberData;

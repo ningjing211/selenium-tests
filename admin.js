@@ -90,19 +90,19 @@ async function admin(order_number, test_email) {
 
 
         let orderNumber = order_number;
-        console.log('印出', orderNumber);
+        console.log('準備審核訂單...');
 
         const ifInput = await new Promise((resolve) => {
-            rl.question('您要更改為手動輸入訂單嗎?(yes/no):', resolve);
+            rl.question('您要更改為手動輸入訂單嗎?(yes/no): ', resolve);
         });
-
+        
         if (ifInput.trim() == 'yes' ) {
             const getOrderID = await new Promise((resolve) => {
-                console.log('準備審核訂單...');
                 rl.question('請輸入訂單號碼: ', resolve);
             });
         }
         console.log('好的, 自動擷取訂單號碼為:', orderNumber);
+        rl.close();
         // const orderIdsInput = await new Promise((resolve) => {
         //     rl.question('請輸入訂單ID（用逗號分隔）: ', resolve);
         // });
@@ -113,7 +113,7 @@ async function admin(order_number, test_email) {
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
 
-        rl.close();
+        
         // 等待登入表單元素顯示
         await driver.wait(until.elementLocated(By.id('user_login')), 30000);
 
@@ -127,7 +127,7 @@ async function admin(order_number, test_email) {
         // 提交登入表單
         await driver.findElement(By.id('wp-submit')).click();
         console.log('已提交登入表單');
-
+        
         // 等待登入完成，檢查是否進入後台首頁
         await driver.wait(until.urlContains('wp-admin'), 30000);
         await takeScreenshot('3-登入成功進入後台.png');
@@ -227,7 +227,7 @@ async function admin(order_number, test_email) {
 
         // 將工作表轉換為 JSON 格式
         const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
-        console.log(data);
+        console.log('改密碼前的客戶角色:', data);
         // 取得 user_email 的值（假設在第二行第二列）
         let user_level = data[1][1]; // 假設 user_level 在第二行第二列（A2, B2, C2, D2...）
         console.log(user_level);
@@ -236,7 +236,7 @@ async function admin(order_number, test_email) {
 
         // 將更新後的 user_level 放回原始的資料中
         data[1][1] = user_level;
-        console.log(data[1][1]);
+        console.log('改完密碼後的客戶角色:', data[1][1]);
         // 將更新後的資料寫回 Excel 檔案
         const updatedSheet = xlsx.utils.aoa_to_sheet(data);
         workbook.Sheets[sheetName] = updatedSheet;
@@ -253,6 +253,6 @@ async function admin(order_number, test_email) {
     }
 }
 
-// admin();
+// admin('5171', '39399@surfman.com');
 
 module.exports = admin;

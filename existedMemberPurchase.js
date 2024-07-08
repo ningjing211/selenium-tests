@@ -13,7 +13,7 @@ const rl = readline.createInterface({
 
 (async function registerAccount() {
     let options = new chrome.Options();
-    options.addArguments('--headless');  // 設置無頭模式
+    // options.addArguments('--headless');  // 設置無頭模式
     options.addArguments('--no-sandbox');
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--ignore-certificate-errors');  // 忽略 SSL 認證錯誤

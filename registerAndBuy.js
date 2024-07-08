@@ -5,6 +5,7 @@ const path = require('path');
 const readline = require('readline');
 const xlsx = require('xlsx');
 
+
 // 設置 readline 接口
 const rl = readline.createInterface({
     input: process.stdin,
@@ -200,10 +201,13 @@ const rl = readline.createInterface({
         console.log('寫入Excel檔案並輸出:', `${testEmail}_purchased_results.xlsx`);
 
         console.log('完成結帳流程');
-
         const admin = require('./admin');
-        admin(orderNumber, testEmail);
+        const changePassword = require('./changePassword');
+        const getMemberData = require('./getMemberData');
 
+        await admin(orderNumber, testEmail);
+        await changePassword(testEmail);
+        await getMemberData(`${testEmail}_purchased_results.xlsx`);
     } finally {
         // 關閉瀏覽器
         await driver.quit();
