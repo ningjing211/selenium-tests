@@ -39,7 +39,7 @@ const rl = readline.createInterface({
         try {
             await takeScreenshot('點選I-agree後.png');
             console.log('點選了我同意');
-            await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 60000); // 增加等待時間為 30 秒
+            await driver.wait(until.elementLocated(By.id('tpul-modal-btn-accept')), 20000); // 增加等待時間為 30 秒
             let acceptButton = await driver.findElement(By.id('tpul-modal-btn-accept'));
             console.log('元素可見確保前');
             // 確保元素可見和可交互
@@ -56,29 +56,6 @@ const rl = readline.createInterface({
         } catch (error) {
             console.error('無法找到或點擊接受按鈕', error);
             await takeScreenshot('8-accept_button_error.png');  // 截圖找不到接受按鈕或點擊錯誤
-        }
-    }
-
-    async function registerNewAccount() {
-        try {
-            // 如果是要註冊新帳號的話
-            // 等待註冊表單元素顯示，增加等待時間至 15 秒
-            await driver.wait(until.elementLocated(By.id('reg_email')), 12000);
-            // 填寫註冊表單
-            timestamp = new Date().getTime().toString().slice(-5);  // 取得當前時間戳記 
-            testEmail = `${timestamp}@surfman.com`;
-            await driver.findElement(By.id('reg_email')).sendKeys(testEmail);  // 使用帳號格式為 timestamp + test_email@example.com
-            console.log('已填寫註冊表單');
-            await takeScreenshot('2-已填寫註冊表單.png');  // 截圖填寫完的註冊表單
-            // 提交註冊表單
-            await driver.findElement(By.name('register')).click();
-            console.log('已提交註冊表單');
-            // 等待註冊完成，檢查是否進入賬戶頁面
-            await driver.wait(until.urlContains('my-account'), 12000);
-            await takeScreenshot('3-註冊完成進入同意頁面.png');  // 截圖註冊後頁面
-
-        } catch (error) {
-            console.error('註冊過程中出現錯誤:', error);
         }
     }
 
@@ -139,7 +116,23 @@ const rl = readline.createInterface({
                 await driver.get('https://www.energyheart.com.tw/my-account/');
                 console.log('已打開註冊頁面');
                 await takeScreenshot('1-2-已打開註冊頁面.png');  // 截圖註冊頁面
-                await registerNewAccount();
+                
+                // 如果是要註冊新帳號的話
+                // 等待註冊表單元素顯示，增加等待時間至 15 秒
+                await driver.wait(until.elementLocated(By.id('reg_email')), 12000);
+                // 填寫註冊表單
+                timestamp = new Date().getTime().toString().slice(-5);  // 取得當前時間戳記 
+                testEmail = `${timestamp}@surfman.com`;
+                await driver.findElement(By.id('reg_email')).sendKeys(testEmail);  // 使用帳號格式為 timestamp + test_email@example.com
+                console.log('已填寫註冊表單');
+                await takeScreenshot('2-已填寫註冊表單.png');  // 截圖填寫完的註冊表單
+                // 提交註冊表單
+                await driver.findElement(By.name('register')).click();
+                console.log('已提交註冊表單');
+                // 等待註冊完成，檢查是否進入賬戶頁面
+                await driver.wait(until.urlContains('my-account'), 12000);
+                await takeScreenshot('3-註冊完成進入同意頁面.png');  // 截圖註冊後頁面
+                
                 // 點擊「接受」按鈕，如果有的話
                 await clickAcceptButton();
                 break; 
@@ -184,6 +177,13 @@ const rl = readline.createInterface({
                 // 等待登入完成，檢查是否進入後台首頁
                 await driver.wait(until.urlContains('my-account'), 2000);
                 console.log('登入成功！');
+                // 檢查是否存在接受按鈕
+                const elements = await driver.findElements(By.id('tpul-modal-btn-accept'));
+                if (elements.length > 0) {
+                    await clickAcceptButton();  // 點擊「接受」按鈕
+                } else {
+                    console.log('沒有發現接受按鈕');
+                }
                 break;
         }
 
@@ -210,7 +210,6 @@ const rl = readline.createInterface({
                 rl.question('您可以繼續購買的套餐為?(請輸入:豪華經典艙/能量商務艙/尊貴頭等艙):', resolve);
             });
 
-            await driver.sleep(30000); 
         }
 
         rl.close();

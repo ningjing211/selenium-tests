@@ -65,14 +65,14 @@ async function getMemberData(file_name) {
         let credit = data[1][4];  // credit 儲值金
         let dividend = data[1][5];  // divident 分潤金
         let share_link = data[1][6]; // shareLink 分享連結
-        console.log(data[1]);
+        console.log('讀取儲值金之前Excel裡面的Data:', data[1]);
         console.log('此帳號為:', user_email);
         console.log('用戶為:', user_level);
         console.log('訂單編號:', user_order);
         console.log('儲值金尚有:', credit);
         console.log('分潤金尚有', dividend);
         console.log('分享連結', share_link);
-
+        await driver.sleep(4200); // 添加延遲以確保上一步操作完成
         await driver.findElement(By.id('user_login')).sendKeys(user_email);
         await driver.findElement(By.id('user_pass')).sendKeys(user_email);
         await driver.findElement(By.id('wp-submit')).click();
@@ -118,7 +118,7 @@ async function getMemberData(file_name) {
         // 將更新後的資料寫回 Excel 檔案
         const updatedSheet = xlsx.utils.aoa_to_sheet(data);
         workbook.Sheets[sheetName] = updatedSheet;
-        console.log(data[1]);
+        console.log('讀取儲值金後準備寫入Excel的Data:', data[1]);
         // 將更新後的 Excel 檔案寫入到磁碟
         xlsx.writeFile(workbook, filePath);
         console.log('成功更新檔案並寫入Excel');

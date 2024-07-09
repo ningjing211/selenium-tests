@@ -228,16 +228,19 @@ async function admin(order_number, test_email) {
 
         // 將工作表轉換為 JSON 格式
         const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
-        console.log('改密碼前的客戶角色:', data);
+        console.log('訂單完成前的客戶資料:', data);
         // 取得 user_email 的值（假設在第二行第二列）
         let user_level = data[1][1]; // 假設 user_level 在第二行第二列（A2, B2, C2, D2...）
-        console.log(user_level);
+        let user_purchased_combo = data[1][2];
+        console.log(user_level, user_purchased_combo);
         // 做一些處理後更新 user_level，這裡只是示範，你可以根據你的需求更新它
         user_level = currentLevel; // 假設要更新成這個新的 email
+        user_purchased_combo = boughtComboPaid;
 
         // 將更新後的 user_level 放回原始的資料中
         data[1][1] = user_level;
-        console.log('改完密碼後的客戶角色:', data[1][1]);
+        data[1][2] = user_purchased_combo;
+        console.log('訂單完成後的客戶資料:', data[1][1], data[1][2]);
         // 將更新後的資料寫回 Excel 檔案
         const updatedSheet = xlsx.utils.aoa_to_sheet(data);
         workbook.Sheets[sheetName] = updatedSheet;
