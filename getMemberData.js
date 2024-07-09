@@ -33,36 +33,18 @@ async function getMemberData(file_name) {
         fs.writeFileSync(path.join(screenshotsDir, filename), image, 'base64');
     }
 
-    // function getMemberInfo(filename) {
-    //     try {
-    //         const filePath = path.join(__dirname, filename);
-    //         const workbook = xlsx.readFile(filePath);
-    //         const sheetName = workbook.SheetNames[0];
-    //         const worksheet = workbook.Sheets[sheetName];
-            
-    //         // 將工作表轉換為 JSON 格式
-    //         const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
-
-    //         // 假設訂單編號在第二行第四列（A1, B1, C1, D1）
-    //         const memberInfo = data; // [1] 是第二行，[3] 是第四列
-    //         return memberInfo;
-    //     } catch (error) {
-    //         console.error('Error reading Excel file:', error);
-    //         return null;
-    //     }
-    // }
-
     try {
 
         console.log('Member Orign已辦完, 準備傳送給MemberSecond的陌生帳號, 讓陌生帳號點擊Member Origin的連結');
         // 打開 WordPress 登入頁面
         console.log('準備登入MemberOrigin的帳號,分別存取儲值金, 分潤金, 分享連結的值');
         await driver.get('https://www.energyheart.com.tw/wp-login.php');
+        await driver.sleep(4200); // 添加延遲以確保上一步操作完成
         console.log('已打開登入頁面');
         await takeScreenshot('1-已打開登入頁面.png');
 
         // 等待登入表單元素顯示
-        await driver.wait(until.elementLocated(By.id('user_login')), 30000);
+        await driver.wait(until.elementLocated(By.id('user_login')), 1000);
 
         // 填寫登入表單
         const filename = file_name;
@@ -96,8 +78,7 @@ async function getMemberData(file_name) {
         await driver.findElement(By.id('wp-submit')).click();
         console.log('已提交登入表單');
         await takeScreenshot('2-已提交登入表單.png');
-        
-
+        await driver.sleep(4200);
         // 等待直到元素可見並取得其值
         let shareUrlInput = await driver.findElement(By.id('share_url'));
         let shareUrlValue = await shareUrlInput.getAttribute('value');

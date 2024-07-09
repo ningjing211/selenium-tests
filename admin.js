@@ -213,7 +213,7 @@ async function admin(order_number, test_email) {
         await takeScreenshot('11-1-已進入使用者管理頁面.png');
 
         let currentLevel = reflectUserLevel(boughtComboPaid);
-        console.log(currentLevel);
+        console.log('當前使用者角色等級:', currentLevel);
 
         // 因為付款成功了, 所以打開檔案寫入經銷商的等級
         // 檔案路徑
