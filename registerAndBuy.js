@@ -59,6 +59,29 @@ const rl = readline.createInterface({
         }
     }
 
+    async function registerNewAccount(testEmail) {
+        try {
+            // 如果是要註冊新帳號的話
+            // 等待註冊表單元素顯示，增加等待時間至 15 秒
+            await driver.wait(until.elementLocated(By.id('reg_email')), 12000);
+            // 填寫註冊表單
+            
+            console.log('印出測試帳號', testEmail);
+            await driver.findElement(By.id('reg_email')).sendKeys(testEmail);  // 使用帳號格式為 timestamp + test_email@example.com
+            console.log('已填寫註冊表單');
+            await takeScreenshot('2-已填寫註冊表單.png');  // 截圖填寫完的註冊表單
+            // 提交註冊表單
+            await driver.findElement(By.name('register')).click();
+            console.log('已提交註冊表單');
+            // 等待註冊完成，檢查是否進入賬戶頁面
+            await driver.wait(until.urlContains('my-account'), 12000);
+            await takeScreenshot('3-註冊完成進入同意頁面.png');  // 截圖註冊後頁面
+
+        } catch (error) {
+            console.error('註冊過程中出現錯誤:', error);
+        }
+    }
+
     async function getExistedMemberLevel(filename) {
         try {
             const filePath = path.join(__dirname, filename);
@@ -147,9 +170,12 @@ const rl = readline.createInterface({
                 const theURL = await driver.getCurrentUrl();
                 console.log('跳轉為連結:', theURL);
                 await takeScreenshot('1-1-1已打開註冊頁面.png');
+                console.log('準備跳準到my-account');
                 await driver.get('https://www.energyheart.com.tw/my-account/');
                 await takeScreenshot('1-1-2已打開註冊頁面.png');
-                await registerNewAccount();
+                timestamp = new Date().getTime().toString().slice(-5);  // 取得當前時間戳記 
+                testEmail = `${timestamp}@surfman.com`;
+                await registerNewAccount(testEmail);
                 // 點擊「接受」按鈕，如果有的話
                 await clickAcceptButton();
                 break;
